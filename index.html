@@ -1,0 +1,82 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Salvapantallas Desk Pro</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #1a1a1a;
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+    }
+    h1 {
+      font-size: 4em;
+      color: #ffffff;
+    }
+    h2 {
+      font-size: 2em;
+      color: #ff0000;
+    }
+    .footer {
+      position: absolute;
+      bottom: 20px;
+      font-size: 1em;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+  <h1 id="clock">--:--</h1>
+  <h2 id="saludo">Cargando...</h2>
+  <p id="clima">Consultando clima...</p>
+  <p class="footer">Bienvenido a la sala Logicalis</p>
+
+  <script>
+    const apiKey = "15ada0421f7356ea2395538c2c5435a3";
+    const ciudad = "San Francisco,AR";
+    const climaElem = document.getElementById("clima");
+    const saludoElem = document.getElementById("saludo");
+    const relojElem = document.getElementById("clock");
+
+    function actualizarHoraYSaludo() {
+      const ahora = new Date();
+      const horas = ahora.getHours().toString().padStart(2, "0");
+      const minutos = ahora.getMinutes().toString().padStart(2, "0");
+      relojElem.textContent = `${horas}:${minutos}`;
+
+      let saludo = "Hola";
+      if (horas < 12) saludo = "☀️ Buenos días";
+      else if (horas < 19) saludo = "🌤 Buenas tardes";
+      else saludo = "🌙 Buenas noches";
+
+      saludoElem.textContent = `${saludo}, Horacio`;
+    }
+
+    async function obtenerClima() {
+      try {
+        const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${ciudad}&appid=${apiKey}&units=metric&lang=es`);
+        const data = await res.json();
+        const temp = data.main.temp.toFixed(1);
+        const estado = data.weather[0].description;
+        climaElem.textContent = `En San Francisco: ${temp}°C - ${estado}`;
+      } catch (err) {
+        climaElem.textContent = "Error al obtener el clima.";
+      }
+    }
+
+    actualizarHoraYSaludo();
+    obtenerClima();
+    setInterval(actualizarHoraYSaludo, 60000);
+    setInterval(obtenerClima, 600000);
+  </script>
+</body>
+</html>
